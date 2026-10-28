@@ -112,6 +112,15 @@ async function commonsSearch(q) {
   } catch (e) {}
   return null;
 }
+// Respaldo: resumen REST de Wikipedia (en y es), devuelve la foto principal del artículo
+async function wikiSummary(title, lang = 'en') {
+  try {
+    const j = await getJSON(`https://${lang}.wikipedia.org/api/rest_v1/page/summary/` + encodeURIComponent(title.replace(/ /g, '_')));
+    return (j.thumbnail && j.thumbnail.source) || (j.originalimage && j.originalimage.source) || null;
+  } catch (e) { return null; }
+}
+// Últimos respaldos genéricos para que ninguna tarjeta quede sin foto
+const GENERIC = { canoas: ['waterfall rainforest Colombia', 'waterfall jungle'], crecida: ['river rainforest', 'river Colombia'], tormenta: ['storm clouds', 'rain clouds sky'], botas: ['hiking boots', 'hiking trail forest'], mamona: ['grilled meat Colombia', 'asado'], lancha: ['boat river Colombia', 'motorboat river'], indio: ['natural pool river rocks', 'river rocks Colombia'], yarumales: ['jungle stream', 'creek rainforest'], raudal: ['river rapids', 'rapids rocks'], sietemachos: ['Caño Cristales', 'red river plants'], selva: ['rainforest', 'tropical forest'], mapa: ['Llanos Orientales', 'savanna Colombia'] };
 let photosLoading = null;
 async function loadPhotos() {
   if (photosLoading) return photosLoading;
@@ -122,18 +131,22 @@ async function loadPhotos() {
       const got = await wikiBatch(titles);
       need.forEach(k => { if (PH[k][0] && got[PH[k][0]]) PHOTO_CACHE[k] = got[PH[k][0]]; });
     }
-    const rest = Object.keys(PH).filter(k => !PHOTO_CACHE[k]);
-    const firsts = rest.filter(k => PH[k].length <= 2), multi = rest.filter(k => PH[k].length > 2);
-    await Promise.all(firsts.map(async k => { const u = await commonsSearch(PH[k][1]); if (u) PHOTO_CACHE[k] = u; }));
-    for (const k of multi) {
-      for (const q of PH[k].slice(1)) {
+    paintPhotos();
+    // Títulos que el lote no trajo: resumen REST en inglés y luego en español
+    await Promise.all(Object.keys(PH).filter(k => !PHOTO_CACHE[k] && PH[k][0]).map(async k => {
+      const u = await wikiSummary(PH[k][0]) || await wikiSummary(PH[k][1] || PH[k][0], 'es');
+      if (u) PHOTO_CACHE[k] = u;
+    }));
+    const used = () => Object.values(PHOTO_CACHE);
+    for (const k of Object.keys(PH).filter(k => !PHOTO_CACHE[k])) {
+      for (const q of PH[k].slice(1).concat(GENERIC[k] || [])) {
         const u = await commonsSearch(q);
-        if (u && !Object.values(PHOTO_CACHE).includes(u)) { PHOTO_CACHE[k] = u; break; }
+        if (u && !used().includes(u)) { PHOTO_CACHE[k] = u; paintPhotos(); break; }
       }
     }
     store.set('photos1', PHOTO_CACHE);
   })();
-  return photosLoading;
+  try { await photosLoading; } finally { photosLoading = null; }
 }
 function paintPhotos(root = document) {
   $$('[data-ph]', root).forEach(el => {
@@ -804,6 +817,12 @@ async function loadCities() {
     const titles = need.map(c => CITY_WIKI[c.id] || c.en || c.es);
     const got = await wikiBatch(titles);
     need.forEach((c, i) => { if (got[titles[i]]) CITY_PH[c.id] = got[titles[i]]; });
+    renderCities();
+    await Promise.all(need.filter(c => !CITY_PH[c.id]).map(async c => {
+      const t = CITY_WIKI[c.id] || c.en || c.es;
+      const u = await wikiSummary(t) || await wikiSummary(c.es, 'es') || await commonsSearch(t);
+      if (u) CITY_PH[c.id] = u;
+    }));
     store.set('cityph', CITY_PH); renderCities();
   }
 }
@@ -824,4 +843,6 @@ loadWeather(); loadFX(); loadCities();
 loadPhotos().then(() => { paintPhotos(); if (map) { map.remove(); map = null; if (current === 'map') initMap(); } });
 setInterval(() => { tickClock(); renderAlert(); }, 30000);
 setInterval(buildTicker, 300000);
-document.addEventListener('visibilitychange', () => { if (!document.hidden) { tickClock(); renderAlert(); buildTicker(); loadWeather(); loadFX(); } });
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { tickClock(); renderAlert(); buildTicker(); loadWeather(); loadFX();
+  if (Object.keys(PH).some(k => !PHOTO_CACHE[k])) loadPhotos().then(() => paintPhotos());
+  if (CITIES.some(c => !CITY_PH[c.id])) loadCities(); } });

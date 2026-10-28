@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flyer — Caño Canoas para Latinos</title>
+<link rel="icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{--red:#EB0A1E;--green:#14653A;--ink:#0B0B0C}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#1b1b1d;font-family:'Barlow',sans-serif;display:flex;flex-direction:column;align-items:center;gap:14px;padding:16px;min-height:100vh}
+.bar{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.bar button,.bar a{border:0;border-radius:999px;padding:12px 18px;font:700 1rem 'Barlow',sans-serif;background:var(--red);color:#fff;cursor:pointer;text-decoration:none}
+.bar a{background:#fff;color:var(--ink)}
+.hint{color:#bbb;font-size:.85rem;text-align:center;max-width:520px}
+.stage{width:min(100%,540px);aspect-ratio:4/5;position:relative}
+#flyer{width:1080px;height:1350px;transform-origin:top left;position:absolute;top:0;left:0;background:var(--ink);color:#fff;overflow:hidden;font-family:'Barlow',sans-serif}
+.hero{position:absolute;inset:0 0 auto 0;height:760px;background:#14653A center/cover no-repeat}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.15) 30%,rgba(11,11,12,1) 100%)}
+.brand{position:absolute;top:44px;left:56px;right:56px;display:flex;justify-content:space-between;align-items:center;z-index:2}
+.logo{background:var(--red);font:800 34px 'Barlow Condensed';padding:10px 18px;border-radius:14px;letter-spacing:1px}
+.lang{background:#fff;color:var(--ink);font:800 26px 'Barlow Condensed';padding:10px 20px;border-radius:999px;letter-spacing:1px}
+.title{position:absolute;left:56px;right:56px;top:330px;z-index:2}
+.kicker{display:inline-block;background:var(--red);font:700 26px 'Barlow';text-transform:uppercase;letter-spacing:2px;padding:6px 16px;border-radius:6px}
+h1{white-space:nowrap;font:800 120px/0.92 'Barlow Condensed';text-transform:uppercase;margin-top:16px}
+h2{font:700 54px/1 'Barlow Condensed';text-transform:uppercase;color:#F2B705;margin-top:8px}
+.strip{position:absolute;top:790px;left:56px;right:56px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.strip div{height:170px;border-radius:20px;background:#333 center/cover no-repeat;position:relative;overflow:hidden}
+.strip div span{position:absolute;left:0;right:0;bottom:0;padding:30px 14px 12px;font:700 24px 'Barlow Condensed';text-transform:uppercase;background:linear-gradient(transparent,rgba(0,0,0,.85))}
+.facts{position:absolute;top:990px;left:56px;right:56px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.fact{border-radius:20px;padding:20px 22px}
+.fact small{display:block;font:700 22px 'Barlow';text-transform:uppercase;letter-spacing:1.5px;opacity:.85}
+.fact b{display:block;font:800 44px/1.02 'Barlow Condensed';text-transform:uppercase;margin-top:6px}
+.f1{background:var(--red)}.f2{background:var(--green)}
+.foot{position:absolute;left:56px;right:56px;bottom:44px;display:flex;gap:24px;align-items:center}
+#qr{background:#fff;padding:12px;border-radius:16px;flex:none}
+.url small{font:600 24px 'Barlow';opacity:.8;display:block}
+.url b{font:800 44px 'Barlow Condensed';display:block;color:#fff;word-break:break-all;line-height:1.05;margin-top:4px}
+.url em{font:600 22px 'Barlow';font-style:normal;opacity:.75;display:block;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="bar"><button id="dl">Descargar flyer (PNG)</button><a href="./">Abrir la app</a></div>
+<p class="hint" id="st">Cargando fotos reales de Wikimedia Commons…</p>
+<div class="stage" id="stage">
+  <div id="flyer">
+    <div class="hero" id="p0"></div>
+    <div class="brand"><div class="logo">CCN</div><div class="lang">ESPAÑOL · ENGLISH</div></div>
+    <div class="title">
+      <span class="kicker">Serranía de La Macarena · Meta</span>
+      <h1>Caño Canoas<br>para Latinos</h1>
+      <h2>La verdad antes de ir</h2>
+    </div>
+    <div class="strip">
+      <div id="p1"><span>Macarenia clavigera</span></div>
+      <div id="p2"><span>Serranía de La Macarena</span></div>
+      <div id="p3"><span>Pava hedionda</span></div>
+    </div>
+    <div class="facts">
+      <div class="fact f1"><small>Estado oficial</small><b>Caño Canoas no está habilitado</b></div>
+      <div class="fact f2"><small>La vía legal</small><b>Caño Cristales 2026 abierto</b></div>
+    </div>
+    <div class="foot">
+      <div id="qr"></div>
+      <div class="url"><small>Cómo llegar, presupuesto, seguridad y SOS:</small><b>cano-canoas-para-latinos.netlify.app</b><em>Desarrollada por Vibras Positivas HM</em></div>
+    </div>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+const URL_APP = 'https://cano-canoas-para-latinos.netlify.app/';
+const PHOTOS = [['Caño_Cristales', 'Caño Cristales'], ['Macarenia_clavigera', 'Macarenia clavigera'], ['Serranía_de_la_Macarena', 'Serranía de la Macarena'], ['Hoatzin', 'Hoatzin']];
+function fit() { const s = document.getElementById('stage').clientWidth / 1080; document.getElementById('flyer').style.transform = `scale(${s})`; }
+addEventListener('resize', fit); fit();
+try { new QRCode(document.getElementById('qr'), { text: URL_APP, width: 150, height: 150, colorDark: '#0B0B0C', colorLight: '#ffffff' }); } catch (e) { document.getElementById('qr').style.display = 'none'; }
+async function img(title, q) {
+  try { const j = await (await fetch('https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(title))).json(); const u = (j.originalimage || j.thumbnail || {}).source; if (u) return u; } catch (e) {}
+  try {
+    const j = await (await fetch('https://commons.wikimedia.org/w/api.php?action=query&format=json&formatversion=2&origin=*&generator=search&gsrnamespace=6&gsrlimit=3&gsrsearch=' + encodeURIComponent(q + ' filetype:bitmap') + '&prop=imageinfo&iiprop=url&iiurlwidth=1200')).json();
+    const p = (j.query && j.query.pages || [])[0]; if (p) return p.imageinfo[0].thumburl;
+  } catch (e) {}
+  return null;
+}
+// Carga cada foto como objeto (con CORS) para que la descarga del PNG la incluya
+function load(u) { return new Promise(r => { const i = new Image(); i.crossOrigin = 'anonymous'; i.onload = () => r(u); i.onerror = () => r(null); i.src = u; }); }
+(async () => {
+  const urls = await Promise.all(PHOTOS.map(p => img(p[0], p[1]).then(u => u && load(u))));
+  urls.forEach((u, i) => { if (u) document.getElementById('p' + i).style.backgroundImage = `url("${u}")`; });
+  document.getElementById('st').textContent = urls.filter(Boolean).length + ' de 4 fotos cargadas. Fotos: Wikipedia / Wikimedia Commons.';
+})();
+document.getElementById('dl').onclick = async () => {
+  const st = document.getElementById('st'); st.textContent = 'Generando imagen…';
+  const f = document.getElementById('flyer'), t = f.style.transform; f.style.transform = 'none';
+  try {
+    const c = await html2canvas(f, { useCORS: true, width: 1080, height: 1350, scale: 1, backgroundColor: '#0B0B0C' });
+    const a = document.createElement('a'); a.download = 'flyer-cano-canoas-para-latinos.png'; a.href = c.toDataURL('image/png'); a.click();
+    st.textContent = 'Listo: flyer descargado (1080 × 1350).';
+  } catch (e) { st.textContent = 'No se pudo generar la imagen. Toma una captura de pantalla del flyer.'; }
+  f.style.transform = t;
+};
+</script>
+</body>
+</html>
